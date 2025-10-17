@@ -12,14 +12,13 @@ INPUT.oninput = e => {
     INPUT.value.split('').forEach(letter => { INPUT_REPEATER.innerHTML += `<span>${letter}</span>` });
 }
 
-INPUT.onkeyup = e => {
-    if (
-        INPUT.value.trim() != '' && (e.key == 'Enter' || e.keyCode == 13)) {
+INPUT.onkeyup = async e => {
+    if (INPUT.value.trim() != '' && (e.key == 'Enter' || e.keyCode == 13)) {
         let userInput = INPUT.value.split(' ');    
         
         let cmd = new Command(userInput.shift(), ...userInput);
-        window.dbg = cmd;
-        
+        await cmd.execute();
+
         appendToHistory(`> ${INPUT.value}`);
         if (cmd.clearRequired) clearHistory();
         if (cmd.results) appendToHistory(cmd.results);

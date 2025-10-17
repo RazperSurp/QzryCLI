@@ -16,9 +16,14 @@ export default class Command {
         this.name = name;
         this.args = args;
 
-        if(typeof this[name] == 'function') {
-            this.results = this[name]() ?? '';
-        } else this.handleError(this.ERRORS.COMMAND_NOT_FOUND);
+        if(typeof this[name] != 'function') this.handleError(this.ERRORS.COMMAND_NOT_FOUND);
+    }
+
+    async execute() {
+        if (this.status == 0) {
+            this.results = await this[this.name]() ?? '';
+            this.status = 1;
+        }
     }
 
     handleError(code) {
@@ -56,7 +61,7 @@ export default class Command {
             idImage = '',
             successFetch = false;
 
-        const generateURI = () => {
+        const generateURI = async () => {
             let idImage = '';
             for (let i = 0; i < 5; i++) idImage += alphabet[Math.floor(Math.random() * alphabet.length)];
 
@@ -66,13 +71,9 @@ export default class Command {
 
         do {
             idImage = generateURI();
-            const response = await fetch(`https://i.imgur.com/${idImage}.jpg`);
+            const response = fetch(`https://i.imgur.com/${idImage}.jpg`);
 
-            if (response.status == 200) {
-                console.log(response);
-
-                successFetch = true;
-            }
+            if (response.status == 200 && response.url != 'https://i.imgur.com/removed.png') successFetch = true;
         } while (!successFetch);
 
         pic.setAttribute('src', `https://i.imgur.com/${idImage}.jpg`)
