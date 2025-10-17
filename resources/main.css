@@ -1,0 +1,101 @@
+body {
+    padding: 50px;
+    background: #9a967a;
+}
+
+body * {
+    font-family: monospace;
+    font-size: 16px;
+    font-weight: 900;
+}
+
+#screen {
+    border-radius: 100px;
+    padding: 100px;
+    background-color: #152f15;
+    height: 800px;
+    background-image: linear-gradient(180deg, #2b5b2b0d 25%, transparent 25%, transparent 50%, transparent 75%, transparent);
+    background-size: 40px 40px;
+    animation: progress-bar-stripes 5s linear infinite;
+    box-sizing: border-box;
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 10px;
+    box-shadow: inset 0px 0px 15px 10px #396e39;
+}
+
+#screen * {
+    color: #00ff00;
+}
+
+#screen input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+#screen input:focus-visible {
+    outline: unset;
+}
+
+#history {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+#history img {
+    max-height: 540px;
+    transition: .15s;
+    mix-blend-mode: color-dodge;
+    animation: imgAppear .75s linear; 
+}
+
+#input {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+
+#line {
+    display: flex;
+}
+
+#input-repeater span {
+    display: inline-block;
+    min-width: 8.8px;
+}
+
+#caret {
+    animation: blink .75s cubic-bezier(1, 0, 0, 1) infinite;
+}
+
+
+@keyframes blink {
+    0% { opacity: 0 }
+    50% { opacity: 1 }
+    100% { opacity: 0 }
+}
+
+@keyframes progress-bar-stripes {
+  from  { background-position-y: 200px; }
+  to    { background-position-y: 0; }
+}
+
+@keyframes imgAppear {
+    0% {
+        mix-blend-mode: hue;
+    } 33% {
+        mix-blend-mode: color;
+    } 66% {
+        mix-blend-mode: color-burn;
+    } 100% {
+        mix-blend-mode: color-dodge;
+    }
+}
