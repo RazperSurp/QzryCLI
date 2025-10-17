@@ -71,7 +71,7 @@ export default class Command {
 
         do {
             idImage = generateURI();
-            const response = fetch(`https://i.imgur.com/${idImage}.jpg`);
+            const response = await fetch(`https://i.imgur.com/${idImage}.jpg`);
 
             if (response.status == 200 && response.url != 'https://i.imgur.com/removed.png') successFetch = true;
         } while (!successFetch);
