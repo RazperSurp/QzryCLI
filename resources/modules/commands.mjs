@@ -55,29 +55,29 @@ export default class Command {
         return pic;
     }
 
-    async randompic() {
-        let alphabet = String('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789').split(''),
-            pic = document.createElement('img'),
-            idImage = '',
-            successFetch = false;
+    // async randompic() {
+    //     let alphabet = String('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789').split(''),
+    //         pic = document.createElement('img'),
+    //         idImage = '',
+    //         successFetch = false;
+    
+    //     const generateURI = async () => {
+    //         let idImage = '';
+    //         for (let i = 0; i < 5; i++) idImage += alphabet[Math.floor(Math.random() * alphabet.length)];
 
-        const generateURI = async () => {
-            let idImage = '';
-            for (let i = 0; i < 5; i++) idImage += alphabet[Math.floor(Math.random() * alphabet.length)];
-
-            return idImage;
-        } 
+    //         return idImage;
+    //     } 
 
 
-        do {
-            idImage = generateURI();
-            const response = await fetch(`https://i.imgur.com/${idImage}.jpg`);
+    //     do {
+    //         idImage = generateURI();
+    //         const response = await fetch(`https://i.imgur.com/${idImage}.jpg`);
 
-            if (response.status == 200 && response.url != 'https://i.imgur.com/removed.png') successFetch = true;
-        } while (!successFetch);
+    //         if (response.status == 200 && response.url != 'https://i.imgur.com/removed.png') successFetch = true;
+    //     } while (!successFetch);
 
-        pic.setAttribute('src', `https://i.imgur.com/${idImage}.jpg`)
-        return pic;
-    }
+    //     pic.setAttribute('src', `https://i.imgur.com/${idImage}.jpg`)
+    //     return pic;
+    // }
 }
 
