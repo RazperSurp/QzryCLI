@@ -68,7 +68,7 @@ export default class Command {
             idImage = generateURI();
             const response = await fetch(`https://i.imgur.com/${idImage}.jpg`);
 
-            if (response.code == 200) {
+            if (response.status == 200) {
                 console.log(response);
 
                 successFetch = true;
