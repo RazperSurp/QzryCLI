@@ -73,15 +73,14 @@ export default class Command {
         do {
             idImage = generateURI();
             const response = await fetch(`https://i.imgur.com/${idImage}.jpg`);
-            console.log(response);
+            console.log([response.status == 200, response.url != 'https://i.imgur.com/removed.png', response.status == 200 && response.url != 'https://i.imgur.com/removed.png']);
 
-            if (response.status == 200 && response.url != 'https://i.imgur.com/removed.png') successFetch = true;
-
-            i++;
+            if (response.status == 200 && response.url != 'https://i.imgur.com/removed.png') {
+                pic.setAttribute('src', `https://i.imgur.com/${idImage}.jpg`)
+                return pic;
+            }
         } while (!successFetch || i < 10);
 
-        pic.setAttribute('src', `https://i.imgur.com/${idImage}.jpg`)
-        return pic;
     }
 }
 
