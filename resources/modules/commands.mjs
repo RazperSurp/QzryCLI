@@ -1,28 +1,40 @@
 import { config } from './config.mjs';
 
 export default class Command {
+    get BASE_PATH () { return '.\\paths\\'; }
+
     get ERRORS () {
         return {
             "COMMAND_NOT_FOUND": -1,
             "IMAGE_NOT_FOUND": -2,
+            "PATH_NOT_FOUND": -3,
         }
     }
 
+    path;
     name;
     args;
     results;
     status = 0;
+
     clearRequired = 0;
-    constructor(name, ...args) {
+    moveTo;
+
+    constructor(path, name, ...args) {
+        this.path = path;
         this.name = name;
-        this.args = args;
+        this.args = args.filter(el => el);
 
         if(typeof this[name] != 'function') this.handleError(this.ERRORS.COMMAND_NOT_FOUND);
     }
 
     async execute() {
         if (this.status == 0) {
-            this.results = await this[this.name]() ?? '';
+            try {
+                this.results = await this[this.name]() ?? '';
+            } catch (e) {
+                this.results = e.message;
+            }
             if (this.status == 0) this.status = 1;
             else this.handleError(this.status);
         } 
@@ -51,6 +63,22 @@ export default class Command {
 
     clear() {
         this.clearRequired = true;
+    }
+
+    async cd() {
+        if (this.args[0]) {
+            this.args[0] = this.args[0].replace(/[..]/g, '')
+            this.args[0] = this.args[0].replace(/[\\]{2,}/g, '\\')
+
+            console.log(this.args[0]);
+
+            let newPath = this.args[0].startsWith('\\') ? this.args[0] : this.path + '\\' + this.args[0];
+            if ((await fetch(this.BASE_PATH + newPath)).status == 200) this.moveTo = newPath;
+            else {
+                this.errmessage = newPath;
+                this.handleError(this.ERRORS.PATH_NOT_FOUND)
+            }
+        }
     }
 
     async pic() {
@@ -91,7 +119,7 @@ export default class Command {
             if (response.status == 200 && response.url != 'https://i.imgur.com/removed.png') {
                 pic.setAttribute('src', `https://i.imgur.com/${idImage}.jpg`)
                 return pic;
-            }
+            }   
         } while (true);
 
     }
