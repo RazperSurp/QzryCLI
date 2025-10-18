@@ -52,6 +52,7 @@ body * {
 
 #history img {
     max-height: 540px;
+    max-width: 100%;
     transition: .15s;
     mix-blend-mode: color-dodge;
     animation: imgAppear .75s linear; 
@@ -76,6 +77,10 @@ body * {
     animation: blink .75s cubic-bezier(1, 0, 0, 1) infinite;
 }
 
+.waiting::before {
+    content: '[-----] processing...';
+    animation: processing 1s linear infinite;
+}
 
 @keyframes blink {
     0% { opacity: 0 }
@@ -97,5 +102,21 @@ body * {
         mix-blend-mode: color-burn;
     } 100% {
         mix-blend-mode: color-dodge;
+    }
+}
+
+@keyframes processing {
+    0% {
+        content: '[=----] processing...'
+    } 20% {
+        content: '[-=---] processing...'
+    } 40% {
+        content: '[--=--] processing...'
+    } 60% {
+        content: '[---=-] processing...'
+    } 80% {
+        content: '[----=] processing...'
+    } 100% {
+        content: '[-----] processing...'
     }
 }

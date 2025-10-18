@@ -17,11 +17,10 @@ INPUT.onkeyup = async e => {
         let userInput = INPUT.value.split(' ');    
         
         let cmd = new Command(userInput.shift(), ...userInput);
-        await cmd.execute();
 
         appendToHistory(`> ${INPUT.value}`);
         if (cmd.clearRequired) clearHistory();
-        if (cmd.results) appendToHistory(cmd.results);
+        appendToHistory(cmd.execute());
         appendToHistory(' ');
 
         INPUT.value = '';
@@ -30,17 +29,34 @@ INPUT.onkeyup = async e => {
 }
 
 function appendToHistory(value, doParsing = false) {
+        console.log(value);
     if (!doParsing) console.log(value)
 
     let container = document.createElement('div');
 
-    if (value instanceof HTMLElement) container.appendChild(value);
-    else container.innerHTML = value;
+    if (value instanceof Promise) {
+        container.classList.add('waiting');
+        value.then(results => {
+            results = results || 'Success';
 
-    if (!doParsing) {
-        window.cmdHistory.push(container.innerHTML);
-        encodeHistory(window.cmdHistory);
+            container.classList.remove('waiting');
+            
+            if (results instanceof HTMLElement) container.appendChild(results);
+            else container.innerHTML = results;
+            
+            window.cmdHistory.push(container.innerHTML);
+            encodeHistory(window.cmdHistory);
+        })
+    } else {
+        if (value instanceof HTMLElement) container.appendChild(value);
+        else container.innerHTML = value;
+        
+        if (!doParsing) {
+            window.cmdHistory.push(container.innerHTML);
+            encodeHistory(window.cmdHistory);
+        }
     }
+
 
     HISTORY.appendChild(container);
 }

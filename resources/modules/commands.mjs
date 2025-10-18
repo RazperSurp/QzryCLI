@@ -3,7 +3,8 @@ import { config } from './config.mjs';
 export default class Command {
     get ERRORS () {
         return {
-            "COMMAND_NOT_FOUND": -1
+            "COMMAND_NOT_FOUND": -1,
+            "IMAGE_NOT_FOUND": -2,
         }
     }
 
@@ -22,13 +23,17 @@ export default class Command {
     async execute() {
         if (this.status == 0) {
             this.results = await this[this.name]() ?? '';
-            this.status = 1;
-        }
+            if (this.status == 0) this.status = 1;
+            else this.handleError(this.status);
+        } 
+
+        
+        return this.results;
     }
 
     handleError(code) {
         this.status = code;
-        this.results = `${config.errors[code]}: ${this.name}`;
+        this.results = `${config.errors[code]}: ${this.errmessage ? this.errmessage : this.name}`;
     }
 
     ping() {
@@ -48,11 +53,19 @@ export default class Command {
         this.clearRequired = true;
     }
 
-    pic() {
-        let pic = document.createElement('img');
-        pic.setAttribute('src', `../../assets/${this.args[0]}`);
-
-        return pic;
+    async pic() {
+        const url = `../../assets/${this.args[0]}`;
+        const response = await fetch(url);
+        
+        if (response.status == 200) {
+            let pic = document.createElement('img');
+            pic.setAttribute('src', `../../assets/${this.args[0]}`);
+            
+            return pic;
+        } else {
+            this.errmessage = this.args[0];
+            this.handleError(this.ERRORS.IMAGE_NOT_FOUND);
+        }
     }
 
     async randompic() {
@@ -78,8 +91,8 @@ export default class Command {
             if (response.status == 200 && response.url != 'https://i.imgur.com/removed.png') {
                 pic.setAttribute('src', `https://i.imgur.com/${idImage}.jpg`)
                 return pic;
-            }
-        } while (!successFetch || i < 10);
+            } else return 1;
+        } while (true);
 
     }
 }
