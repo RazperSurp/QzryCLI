@@ -91,7 +91,7 @@ export default class Command {
             if (response.status == 200 && response.url != 'https://i.imgur.com/removed.png') {
                 pic.setAttribute('src', `https://i.imgur.com/${idImage}.jpg`)
                 return pic;
-            } else return 1;
+            }
         } while (true);
 
     }
