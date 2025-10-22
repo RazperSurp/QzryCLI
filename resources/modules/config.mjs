@@ -44,9 +44,13 @@ export let config = {
             }
         }
     },
+    users: [
+        {username: 'guest', firstname: 'Аноним'}
+    ],
     errors: {
-        "-1": "Команда не найдена",
-        "-2": "Изображение не найдено",
-        "-3": "Путь не найден"
+        COMMAND_NOT_FOUND: "Команда не найдена",
+        FILE_NOT_FOUND: "Файл не найден",
+        PATH_NOT_FOUND: "Путь не найден",
+        INVALID_CREDENTIALS: "Авторизация провалена"
     }
 }

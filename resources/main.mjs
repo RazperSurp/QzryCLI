@@ -1,4 +1,4 @@
-import Command from './modules/commands.mjs';
+import Command from './modules/Command.mjs';
 
 const INPUT = document.querySelector('#input > input');
 const INPUT_REPEATER = document.getElementById('input-repeater');

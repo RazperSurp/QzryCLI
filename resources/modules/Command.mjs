@@ -20,7 +20,7 @@ export default class Command {
     clearRequired = 0;
     moveTo;
 
-    constructor(path, name, ...args) {
+    constructor(name, ...args) {
         this.path = path;
         this.name = name;
         this.args = args.filter(el => el);
