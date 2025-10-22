@@ -7,7 +7,7 @@ export default class User {
     get homePath() { return `\\root\\users\\${this.username}\\home`; }
 
     constructor(username, password = null) {
-        for (user of config.users) {
+        for (let user of config.users) {
             if (
                 user.username == username && 
                 ((user.password !== undefined && user.password == password) ||

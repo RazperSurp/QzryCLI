@@ -45,7 +45,7 @@ export let config = {
         }
     },
     users: [
-        {username: 'guest', firstname: 'Аноним'}
+        {username: 'guest', firstname: 'Anonymous'}
     ],
     errors: {
         COMMAND_NOT_FOUND: "Команда не найдена",
