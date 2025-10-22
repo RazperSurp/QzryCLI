@@ -27,6 +27,23 @@ export let config = {
             }, comment: 'Переходит в другую директорию'
         }
     },
+    struct: {
+        root: {
+            directories: {
+                users: {
+                    directories: {
+                        home: {
+                            directories: {
+                                files: {
+                                    files: ['passwd.txt']
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
     errors: {
         "-1": "Команда не найдена",
         "-2": "Изображение не найдено",

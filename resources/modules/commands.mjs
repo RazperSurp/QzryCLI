@@ -67,17 +67,12 @@ export default class Command {
 
     async cd() {
         if (this.args[0]) {
-            this.args[0] = this.args[0].replace(/[..]/g, '')
-            this.args[0] = this.args[0].replace(/[\\]{2,}/g, '\\')
+            let path = this.args[0].replace(/[..]/g, '').replace(/[\\]{2,}/g, '\\').split('\\');
 
-            console.log(this.args[0]);
+            console.log(path);
 
-            let newPath = this.args[0].startsWith('\\') ? this.args[0] : this.path + '\\' + this.args[0];
-            if ((await fetch(this.BASE_PATH + newPath)).status == 200) this.moveTo = newPath;
-            else {
-                this.errmessage = newPath;
-                this.handleError(this.ERRORS.PATH_NOT_FOUND)
-            }
+            // let path = this.args[0].split
+            // if (config.struct)
         }
     }
 
