@@ -32,10 +32,14 @@ export let config = {
             directories: {
                 users: {
                     directories: {
-                        home: {
+                        guest: {
                             directories: {
-                                files: {
-                                    files: ['passwd.txt']
+                                home: {
+                                    directories: {
+                                        files: {
+                                            files: ['passwd.txt']
+                                        }
+                                    }
                                 }
                             }
                         }

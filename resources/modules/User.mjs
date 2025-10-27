@@ -4,7 +4,7 @@ export default class User {
     username;
     firstname;
 
-    get homePath() { return `\\root\\users\\${this.username}\\home`; }
+    get homePath() { return `users\\${this.username}\\home`; }
 
     constructor(username, password = null) {
         for (let user of config.users) {

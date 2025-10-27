@@ -1,11 +1,14 @@
 import Command from "./Command.mjs";
 import { config } from "./config.mjs";
+import Directory from "./Directory.mjs";
 import User from "./User.mjs";
 
 export default class Application {
     __currentPath;
+    currentDir;
     user;
     command;
+    directories;
 
     containers = {
         history: document.querySelector('#history'),
@@ -23,26 +26,30 @@ export default class Application {
         this.__echo(`Logged as ${this.user.firstname}`, { color: 'gray' });
         document.querySelector('#user').innerText = `${this.user.username}@QzryCLI:`;
         
+        this.directories = Directory.parse();
+        this.currentDir = Directory.findByPath(this.user.homePath);
+        console.log(this.currentDir);
+
         this.__currentPath = this.user.homePath;
     }
 
     async process(...input) {
         this.__echo(`${this.user.username}@QzryCLI: ${this.currentPath}> ${input.join(' ')}`)
-        this.command = new Command(input.shift(), input);
+        this.command = new Command(input.shift(), ...input);
 
         let loader = this.__echo('');
         loader.classList.add('waiting');
 
         let results = await this.command.execute();
 
-        if (results && results.status == 'error') this.__handleError(results.name, results.msg, loader);
+        if (results && results.status == 'error') this.__handleError(results.name, results.code, results.msg, loader);
         else {
             loader.classList.remove('waiting');
             this.__echo(results, null, loader);
         }
     }
 
-    __handleError(name, msg = null, element = null) {
+    __handleError(name, code, msg = null, element = null) {
         let error =`${name}: ${config.errors[code] ?? 'Undefined exception'} ${(msg ? `(${msg})` : '')}`;
         this.__echo(`<ERROR> ${error}`, { color: 'red' }, element);
         console.error(error);

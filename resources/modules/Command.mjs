@@ -1,4 +1,5 @@
 import { config } from './config.mjs';
+import Directory from './Directory.mjs';
 
 export default class Command {
     get BASE_PATH () { return '.\\paths\\'; }
@@ -67,12 +68,11 @@ export default class Command {
 
     async cd() {
         if (this.args[0]) {
-            let path = this.args[0].replace(/[..]/g, '').replace(/[\\]{2,}/g, '\\').split('\\');
 
-            console.log(path);
+            if (this.args[0].startsWith('\\')) window.Application.currentDir = Directory.findByPath(this.args[0]);
+            else window.Application.currentDir = Directory.findByPath(this.args[0], window.Application.currentDir);
 
-            // let path = this.args[0].split
-            // if (config.struct)
+            return window.Application.currentDir;
         }
     }
 
