@@ -5,7 +5,7 @@ import User from "./User.mjs";
 
 export default class Application {
     __currentPath;
-    currentDir;
+    __currentDir;
     user;
     command;
     directories;
@@ -19,18 +19,22 @@ export default class Application {
 
     get currentPath() { return this.__currentPath.replace(this.user.homePath, '~') }
 
+    set currentDir(directory) {
+        this.__currentDir = directory;
+        this.__currentPath = directory.stringify();
+        this.containers.path.innerText = this.currentPath;
+    }
+
     constructor (user = null, password = null) {
         this.user = User.login(user ?? 'guest', password);
         if (!(this.user instanceof User)) this.__handleError('INVALID_CREDENTIALS');
 
-        this.__echo(`Logged as ${this.user.firstname}`, { color: 'gray' });
+        this.__echo(`<log> Вход выполнен: ${this.user.firstname} </log>`);
         document.querySelector('#user').innerText = `${this.user.username}@QzryCLI:`;
         
         this.directories = Directory.parse();
         this.currentDir = Directory.findByPath(this.user.homePath);
         console.log(this.currentDir);
-
-        this.__currentPath = this.user.homePath;
     }
 
     async process(...input) {
@@ -42,16 +46,21 @@ export default class Application {
 
         let results = await this.command.execute();
 
-        if (results && results.status == 'error') this.__handleError(results.name, results.code, results.msg, loader);
-        else {
+        if (results && results.status == 'error') {
+            console.log(results);
+            this.__handleError(results.name, results.code, results.msg, loader);
+        } else {
             loader.classList.remove('waiting');
             this.__echo(results, null, loader);
         }
     }
 
     __handleError(name, code, msg = null, element = null) {
-        let error =`${name}: ${config.errors[code] ?? 'Undefined exception'} ${(msg ? `(${msg})` : '')}`;
-        this.__echo(`<ERROR> ${error}`, { color: 'red' }, element);
+        console.log(arguments);
+
+        let error =`${code}/${name}: ${msg ?? 'Undefined exception'}`;
+        this.__echo(`<ERROR> ERR_${error}`, { color: 'red' }, element);
+        element.classList.remove('waiting');
         console.error(error);
     } 
 
@@ -77,7 +86,8 @@ export default class Application {
         element = element ?? document.createElement('span');
         Object.assign(element.style, style);
 
-        element.innerHTML = msg;
+        if (element === null) element.innerHTML = msg;
+        else element.innerHTML = msg;
 
         this.containers.history.appendChild(element);
 

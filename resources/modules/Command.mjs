@@ -5,12 +5,13 @@ export default class Command {
     get BASE_PATH () { return '.\\paths\\'; }
 
     get ERRORS () {
-        return {
-            "COMMAND_NOT_FOUND": -1,
-            "IMAGE_NOT_FOUND": -2,
-            "PATH_NOT_FOUND": -3,
-        }
+        let errors = {};
+        Object.keys(config.errors).forEach((code, i) => { errors[(i + 1) * -1] = code; })
+
+        return errors;
     }
+
+    __app;
 
     path;
     name;
@@ -22,11 +23,13 @@ export default class Command {
     moveTo;
 
     constructor(name, ...args) {
+        this.__app = window.Application;
+
         this.path = path;
         this.name = name;
         this.args = args.filter(el => el);
 
-        if(typeof this[name] != 'function') this.handleError(this.ERRORS.COMMAND_NOT_FOUND);
+        if(typeof this[name] != 'function') this.results = this.handleError('COMMAND_NOT_FOUND');
     }
 
     async execute() {
@@ -34,19 +37,34 @@ export default class Command {
             try {
                 this.results = await this[this.name]() ?? '';
             } catch (e) {
+                console.error(e);
                 this.results = e.message;
             }
             if (this.status == 0) this.status = 1;
-            else this.handleError(this.status);
         } 
 
-        
+        console.log(this.results);
         return this.results;
     }
 
-    handleError(code) {
-        this.status = code;
-        this.results = `${config.errors[code]}: ${this.errmessage ? this.errmessage : this.name}`;
+    handleError(name) {
+        this.status = typeof name == 'string' ? this.__findErrorStatusByName(name) : name;
+
+        return {
+            status: 'error',
+            name: this.ERRORS[this.status],
+            code: this.status,
+            msg: config.errors[name]
+        }
+    }
+
+    __findErrorStatusByName(name) {
+        let errMap = Object.entries(this.ERRORS).filter(err => err[1] == name)[0];
+        let result = errMap ? errMap[0] : -1;
+
+        console.warn(result);
+
+        return result;
     }
 
     ping() {
@@ -68,55 +86,75 @@ export default class Command {
 
     async cd() {
         if (this.args[0]) {
+            let directory = this.args[0].startsWith('\\') ? Directory.findByPath(this.args[0]) : Directory.findByPath(this.args[0], this.__app.__currentDir);
+            if (directory.status == 'error') return this.handleError(directory.code);
+            else this.__app.currentDir = directory;
 
-            if (this.args[0].startsWith('\\')) window.Application.currentDir = Directory.findByPath(this.args[0]);
-            else window.Application.currentDir = Directory.findByPath(this.args[0], window.Application.currentDir);
-
-            return window.Application.currentDir;
-        }
+            return `<log> Сменили директорию на "${directory.stringify()}" </log>`;
+        } else return this.handleError('ARGUMENT_NOT_FOUND');
     }
 
-    async pic() {
-        const url = `../../assets/${this.args[0]}`;
-        const response = await fetch(url);
-        
-        if (response.status == 200) {
-            let pic = document.createElement('img');
-            pic.setAttribute('src', `../../assets/${this.args[0]}`);
-            
-            return pic;
-        } else {
-            this.errmessage = this.args[0];
-            this.handleError(this.ERRORS.IMAGE_NOT_FOUND);
-        }
+    async open() {
+        if (this.args[0]) {
+            let fileName = this.args[0]
+            if (this.__app.__currentDir.files.find(name => name === fileName)) {
+                const FILE_HREF = `\\paths\\root\\${this.__app.__currentDir.stringify()}\\${fileName}`;
+
+                let fileContent = await fetch(FILE_HREF);
+
+                const checkType = (type) => {
+                    console.log(type);
+
+                    if (type == 'text/plain') return 0;
+                    if (type.startsWith('image')) return 1;
+                } 
+
+                this.__app.__echo(`<log> ===[ CONTENT OF ${fileName} ]=== </log>`)
+                switch (checkType(fileContent.headers.get('Content-type').split(';')[0])) {
+                    case 0: this.__app.__echo(await fileContent.text()); break;
+                    case 1: this.__app.__echo(`<img src="${FILE_HREF}">`); break;
+                    default: return this.handleError('CONTENT_TYPE_NOT_SUPPORTED');
+                }
+
+                this.__app.__echo(`\n<log> ===[ END ]=== </log>`);
+
+            } else return this.handleError('FILE_NOT_FOUND');
+        } else return this.handleError('ARGUMENT_NOT_FOUND');
+    }
+
+    async ls() {
+        return this.__app.__currentDir.children;
     }
 
     async randompic() {
-        let alphabet = String('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789').split(''),
-            pic = document.createElement('img'),
-            idImage = '',
-            successFetch = false,
-            i = 0;
-    
-        const generateURI = () => {
-            let idImage = '';
-            for (let i = 0; i < 5; i++) idImage += alphabet[Math.floor(Math.random() * alphabet.length)];
+        if (window.location.hostname == '127.0.0.1') {
+            return this.handleError('UNAVALIBLE_IN_LOCAL');
+        } else {
+            let alphabet = String('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789').split(''),
+                pic = document.createElement('img'),
+                idImage = '',
+                successFetch = false,
+                i = 0;
+        
+            const generateURI = () => {
+                let idImage = '';
+                for (let i = 0; i < 5; i++) idImage += alphabet[Math.floor(Math.random() * alphabet.length)];
 
-            return idImage;
-        } 
+                return idImage;
+            } 
 
 
-        do {
-            idImage = generateURI();
-            const response = await fetch(`https://i.imgur.com/${idImage}.jpg`);
-            console.log([response.status == 200, response.url != 'https://i.imgur.com/removed.png', response.status == 200 && response.url != 'https://i.imgur.com/removed.png']);
+            do {
+                idImage = generateURI();
+                const response = await fetch(`https://i.imgur.com/${idImage}.jpg`);
+                console.log([response.status == 200, response.url != 'https://i.imgur.com/removed.png', response.status == 200 && response.url != 'https://i.imgur.com/removed.png']);
 
-            if (response.status == 200 && response.url != 'https://i.imgur.com/removed.png') {
-                pic.setAttribute('src', `https://i.imgur.com/${idImage}.jpg`)
-                return pic;
-            }   
-        } while (true);
-
+                if (response.status == 200 && response.url != 'https://i.imgur.com/removed.png') {
+                    pic.setAttribute('src', `https://i.imgur.com/${idImage}.jpg`)
+                    return pic;
+                }   
+            } while (true);
+        }
     }
 }
 

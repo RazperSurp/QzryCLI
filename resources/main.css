@@ -24,6 +24,7 @@ body * {
     justify-content: flex-end;
     gap: 10px;
     box-shadow: inset 0px 0px 15px 10px #396e39;
+    overflow-y: auto;
 }
 
 #screen * {
@@ -80,6 +81,14 @@ body * {
 .waiting::before {
     content: '[-----] processing...';
     animation: processing 1s linear infinite;
+}
+
+error {
+    color: red !important;
+}
+
+log {
+    color: gray !important;
 }
 
 @keyframes blink {

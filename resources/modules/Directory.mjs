@@ -8,6 +8,10 @@ export default class Directory {
     parent;
     current;
 
+    get children() {
+        return this.directories.concat(this.files).map(el => { return el instanceof Directory ? `<span style="color: beige"> ${el.name} </span>` : `<span style="color: cornflowerblue"> ${el} </span>` }).join("\t\t");
+    }
+
     constructor(name, structObj, parent) {
         this.name = name;
         this.current = structObj;
@@ -16,6 +20,16 @@ export default class Directory {
         if (this.name == 'root') Directory.root = this;
 
         this.files = structObj.files ?? [];
+    }
+
+    stringify() {
+        let directory = this, path = [];
+        do {
+            path.push(directory.name);
+            directory = directory.parent;
+        } while (directory.parent);
+
+        return path.reverse().join('\\');
     }
 
     static parse(name = 'root', struct = config.struct.root, parent = null) {

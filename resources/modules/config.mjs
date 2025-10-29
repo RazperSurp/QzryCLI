@@ -35,9 +35,10 @@ export let config = {
                         guest: {
                             directories: {
                                 home: {
+                                    files: ['passwd.txt'],
                                     directories: {
                                         files: {
-                                            files: ['passwd.txt']
+                                            files: ['secret.jpeg']
                                         }
                                     }
                                 }
@@ -52,9 +53,13 @@ export let config = {
         {username: 'guest', firstname: 'Anonymous'}
     ],
     errors: {
+        UNDEFINED_EXCEPTION: "Неизвестная ошибка",
         COMMAND_NOT_FOUND: "Команда не найдена",
         FILE_NOT_FOUND: "Файл не найден",
         PATH_NOT_FOUND: "Путь не найден",
-        INVALID_CREDENTIALS: "Авторизация провалена"
+        INVALID_CREDENTIALS: "Авторизация провалена",
+        UNAVALIBLE_IN_LOCAL: "Невозможно выполнить команду в локальном режиме",
+        ARGUMENT_NOT_FOUND: "Не переданы дополнительные параметры",
+        CONTENT_TYPE_NOT_SUPPORTED: "Тип данных файла не поддерживается"
     }
 }
