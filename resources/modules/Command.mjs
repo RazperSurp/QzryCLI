@@ -98,7 +98,7 @@ export default class Command {
         if (this.args[0]) {
             let fileName = this.args[0]
             if (this.__app.__currentDir.files.find(name => name === fileName)) {
-                const FILE_HREF = `\\paths\\root\\${this.__app.__currentDir.stringify()}\\${fileName}`;
+                const FILE_HREF = `paths\\root\\${this.__app.__currentDir.stringify()}\\${fileName}`;
 
                 let fileContent = await fetch(FILE_HREF);
 
@@ -131,7 +131,7 @@ export default class Command {
             return this.handleError('UNAVALIBLE_IN_LOCAL');
         } else {
             let alphabet = String('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789').split(''),
-                pic = document.createElement('img'),
+                pic = '',
                 idImage = '',
                 successFetch = false,
                 i = 0;
@@ -150,8 +150,7 @@ export default class Command {
                 console.log([response.status == 200, response.url != 'https://i.imgur.com/removed.png', response.status == 200 && response.url != 'https://i.imgur.com/removed.png']);
 
                 if (response.status == 200 && response.url != 'https://i.imgur.com/removed.png') {
-                    pic.setAttribute('src', `https://i.imgur.com/${idImage}.jpg`)
-                    return pic;
+                    return `<img src="https://i.imgur.com/${idImage}.jpg">`;
                 }   
             } while (true);
         }
