@@ -1,3 +1,4 @@
+import Mineswepper from '../games/Mineswepper.mjs';
 import { config } from './config.mjs';
 import Directory from './Directory.mjs';
 
@@ -68,6 +69,8 @@ export default class Command {
     }
 
     ping() {
+        new Mineswepper();
+
         return 'ПОНГ'
     }
     
@@ -155,6 +158,10 @@ export default class Command {
                 }   
             } while (true);
         }
+    }
+
+    async mineswepper() {
+
     }
 }
 

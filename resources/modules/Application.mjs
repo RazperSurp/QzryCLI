@@ -10,6 +10,11 @@ export default class Application {
     command;
     directories;
 
+    state = 0;
+    processes = [];
+
+    get STATES() { return { WAITING: 0, PROCESSING: 1, LOCKED: 2 } }
+
     containers = {
         history: document.querySelector('#history'),
         path: document.querySelector('#path')
@@ -38,20 +43,31 @@ export default class Application {
     }
 
     async process(...input) {
-        this.__echo(`${this.user.username}@QzryCLI: ${this.currentPath}> ${input.join(' ')}`)
-        this.command = new Command(input.shift(), ...input);
+        if (this.state != this.STATES.PROCESSING) {
+            this.state = this.STATES.PROCESSING;
 
-        let loader = this.__echo('');
-        loader.classList.add('waiting');
+            this.__echo(`${this.user.username}@QzryCLI: ${this.currentPath}> ${input.join(' ')}`)
+            this.command = new Command(input.shift(), ...input);
 
-        let results = await this.command.execute();
+            this.processes.push({ command: this.command, results: null });
 
-        if (results && results.status == 'error') {
-            console.log(results);
-            this.__handleError(results.name, results.code, results.msg, loader);
+            let loader = this.__echo('');
+            loader.classList.add('waiting');
+
+            let results = await this.command.execute();
+            this.processes[this.processes.length - 1].results = results.status == 'error' ? results : { status: 'success', content: results };
+
+            if (this.processes[this.processes.length - 1].results && this.processes[this.processes.length - 1].results.status == 'error') {
+                this.__handleError(this.processes[this.processes.length - 1].results.name, this.processes[this.processes.length - 1].results.code, this.processes[this.processes.length - 1].results.msg, loader);
+            } else {
+                loader.classList.remove('waiting');
+                this.__echo(this.processes[this.processes.length - 1].results, null, loader);
+            }
+            
+            this.state = this.STATES.WAITING;
         } else {
-            loader.classList.remove('waiting');
-            this.__echo(results, null, loader);
+            console.warn('Unable to process another interaction until previous is still running:');
+            console.warn(this.processes[this.processes.length - 1])
         }
     }
 

@@ -61,5 +61,22 @@ export let config = {
         UNAVALIBLE_IN_LOCAL: "Невозможно выполнить команду в локальном режиме",
         ARGUMENT_NOT_FOUND: "Не переданы дополнительные параметры",
         CONTENT_TYPE_NOT_SUPPORTED: "Тип данных файла не поддерживается"
+    },
+    games: {
+        mineswepper: {
+            interval: { enabled: true },
+            area: {
+                width: {
+                    min: 2,
+                    max: 100
+                }, height: {
+                    min: 2,
+                    max: 100
+                }, mines: { // w*h * value e [min, max]
+                    min: 0.3,
+                    max: 0.9
+                }
+            }
+        }
     }
 }
