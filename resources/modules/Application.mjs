@@ -1,3 +1,4 @@
+import Mineswepper from "../games/Mineswepper.mjs";
 import Command from "./Command.mjs";
 import { config } from "./config.mjs";
 import Directory from "./Directory.mjs";
@@ -6,21 +7,35 @@ import User from "./User.mjs";
 export default class Application {
     __currentPath;
     __currentDir;
+    __locker;
+    __state = 0;
+
     user;
     command;
     directories;
 
-    state = 0;
     processes = [];
-
-    get STATES() { return { WAITING: 0, PROCESSING: 1, LOCKED: 2 } }
+    history = [];
 
     containers = {
         history: document.querySelector('#history'),
         path: document.querySelector('#path')
     };
 
-    history = [];
+    get STATES() { return { WAITING: 0, PROCESSING: 1, LOCKED: 2 } }
+
+    get state() { return this.__state; }
+    set state(value) {
+        this.__state = value;
+        switch(this.__state) {
+            case this.STATES.LOCKED:
+                window.Application.containers.path.parentNode.parentNode.style.opacity = '0';
+                break;
+            default:
+                window.Application.containers.path.parentNode.parentNode.style.opacity = '1';
+                break;
+        }
+    }
 
     get currentPath() { return this.__currentPath.replace(this.user.homePath, '~') }
 
@@ -39,7 +54,6 @@ export default class Application {
         
         this.directories = Directory.parse();
         this.currentDir = Directory.findByPath(this.user.homePath);
-        console.log(this.currentDir);
     }
 
     async process(...input) {
@@ -54,17 +68,34 @@ export default class Application {
             let loader = this.__echo('');
             loader.classList.add('waiting');
 
-            let results = await this.command.execute();
-            this.processes[this.processes.length - 1].results = results.status == 'error' ? results : { status: 'success', content: results };
+            const echoData = (results) => {
+                console.log(results);
+                if (results && results.status == 'error') {
+                    this.__handleError(results.name, results.code, results.msg, loader);
+                } else {
+                    loader.classList.remove('waiting');
+                    if (results) this.__echo(results.content, null, loader);
+                }
+            }
 
-            if (this.processes[this.processes.length - 1].results && this.processes[this.processes.length - 1].results.status == 'error') {
-                this.__handleError(this.processes[this.processes.length - 1].results.name, this.processes[this.processes.length - 1].results.code, this.processes[this.processes.length - 1].results.msg, loader);
-            } else {
-                loader.classList.remove('waiting');
-                this.__echo(this.processes[this.processes.length - 1].results, null, loader);
+            let results = await this.command.execute();
+            switch (results.status) {
+                case 'error': 
+                    this.processes[this.processes.length - 1].results = results;
+                    echoData(this.processes[this.processes.length - 1].results);
+                    break;
+                case 'lock':
+                    this.processes[this.processes.length - 1].results = results;
+                    this.__handleLocker();
+                    echoData();
+                    break;
+                default: 
+                    this.processes[this.processes.length - 1].results = { status: 'success', content: results };
+                    echoData(this.processes[this.processes.length - 1].results);
+                    break;
             }
             
-            this.state = this.STATES.WAITING;
+            this.state = this.state == this.STATES.PROCESSING ? this.STATES.WAITING : this.STATES.LOCKED;
         } else {
             console.warn('Unable to process another interaction until previous is still running:');
             console.warn(this.processes[this.processes.length - 1])
@@ -72,8 +103,6 @@ export default class Application {
     }
 
     __handleError(name, code, msg = null, element = null) {
-        console.log(arguments);
-
         let error =`${code}/${name}: ${msg ?? 'Undefined exception'}`;
         this.__echo(`<ERROR> ERR_${error}`, { color: 'red' }, element);
         element.classList.remove('waiting');
@@ -81,6 +110,8 @@ export default class Application {
     } 
 
     __parseHistory() {
+        console.log(window.sessionStorage.getItem('history'))
+
         this.history = JSON.parse(window.sessionStorage.getItem('history')) ?? [];
         for (line of this.history) this.__appendToHistory(line, null, true);
     }
@@ -96,6 +127,22 @@ export default class Application {
         }
         
         this.__echo(line, style);
+    }
+
+    __handleLocker() {
+        this.state = this.STATES.LOCKED;
+        let objParams = this.processes[this.processes.length - 1].results.params ? this.processes[this.processes.length - 1].results.params : null;
+
+        switch (this.processes[this.processes.length - 1].results.class) {
+            case 'Mineswepper':
+                this.__locker = new Mineswepper(...this.processes[this.processes.length - 1].results.params);
+                this.__locker.start();
+
+                break;
+        }
+    }
+
+    onkeyup(e) {
     }
 
     __echo(msg, style, element = null) {

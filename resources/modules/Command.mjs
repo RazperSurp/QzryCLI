@@ -1,6 +1,7 @@
 import Mineswepper from '../games/Mineswepper.mjs';
 import { config } from './config.mjs';
 import Directory from './Directory.mjs';
+import Toolbox from './Toolbox.mjs';
 
 export default class Command {
     get BASE_PATH () { return '.\\paths\\'; }
@@ -44,7 +45,6 @@ export default class Command {
             if (this.status == 0) this.status = 1;
         } 
 
-        console.log(this.results);
         return this.results;
     }
 
@@ -69,7 +69,6 @@ export default class Command {
     }
 
     ping() {
-        new Mineswepper();
 
         return 'ПОНГ'
     }
@@ -112,14 +111,39 @@ export default class Command {
                     if (type.startsWith('image')) return 1;
                 } 
 
-                this.__app.__echo(`<log> ===[ CONTENT OF ${fileName} ]=== </log>`)
+                let logStr = `=========[ ${fileName} ]=========`;
+                this.__app.__echo(`<log> ${logStr} </log>`)
                 switch (checkType(fileContent.headers.get('Content-type').split(';')[0])) {
-                    case 0: this.__app.__echo(await fileContent.text()); break;
+                    case 0:
+                        const printSymbol = (symbol, result, container) => {
+                            return new Promise((resolve) => {
+                                let i = 0, printInterval = setInterval(() => { 
+                                    if (i < 3) {
+                                        this.__app.__echo(result + String.fromCharCode(Toolbox.randomIntBetween(1000, 10000)), null, container);
+                                        i++;
+                                    } else {
+                                        clearInterval(printInterval);
+                                        result = result + symbol;
+                                        this.__app.__echo(result, null, container);
+
+                                        resolve(result);
+                                    }
+                                }, 10)
+                            })
+                        }
+
+                        let result = '', content = ((await fileContent.text()).replace(/\n/g, '<br>')).split('');
+                        let container = this.__app.__echo('');
+                        container.classList.add('content');
+
+                        do { result = await printSymbol(content.shift(), result, container) } while (content.length > 0);
+                        
+                        break;
                     case 1: this.__app.__echo(`<img src="${FILE_HREF}">`); break;
                     default: return this.handleError('CONTENT_TYPE_NOT_SUPPORTED');
                 }
 
-                this.__app.__echo(`\n<log> ===[ END ]=== </log>`);
+                this.__app.__echo(`\n<log> ${String('').padEnd(logStr.length, '=')} </log>`);
 
             } else return this.handleError('FILE_NOT_FOUND');
         } else return this.handleError('ARGUMENT_NOT_FOUND');
@@ -160,7 +184,7 @@ export default class Command {
     }
 
     async mineswepper() {
-
+        return {status: 'lock', class: 'Mineswepper', params: [this.args[0], this.args[1], this.args[2]]}
     }
 }
 

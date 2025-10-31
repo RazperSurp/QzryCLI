@@ -11,15 +11,22 @@ window.Directory = Directory;
 INPUT.focus();
 document.body.onclick = e => { INPUT.focus() }
 INPUT.oninput = e => {
-    INPUT_REPEATER.innerText = '';
-    INPUT.value.split('').forEach(letter => { INPUT_REPEATER.innerHTML += `<span>${letter}</span>` });
+    if (window.Application.state != window.Application.STATES.LOCKED) {
+        INPUT_REPEATER.innerText = '';
+        INPUT.value.split('').forEach(letter => { INPUT_REPEATER.innerHTML += `<span>${letter}</span>` });
+    } else INPUT.value = '';
 }
 
 INPUT.onkeyup = async e => {
-    if (INPUT.value.trim() != '' && (e.key == 'Enter' || e.keyCode == 13)) {
-        window.Application.process(...INPUT.value.split(' '));
+    if (window.Application.state != window.Application.STATES.LOCKED) {
+        if (INPUT.value.trim() != '' && (e.key == 'Enter' || e.keyCode == 13)) {
+            window.Application.process(...INPUT.value.split(' '));
 
+            INPUT.value = '';
+            INPUT_REPEATER.innerText = '';
+        }
+    } else {
         INPUT.value = '';
-        INPUT_REPEATER.innerText = '';
+        if (typeof window.Application.__locker.processKeyup == 'function') window.Application.__locker.processKeyup(e);
     }
 }

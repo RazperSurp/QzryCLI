@@ -22,8 +22,3 @@ export default class Toolbox {
         return Math.round(((Math.random() * (max - min)) + min) * MULTIPLIER) / MULTIPLIER;
     }
 }
-
-min = 100, max = 250, precision = 2
-
-// [0,3; 0,9)
-// 0.65 <=> 65% W*H - mines

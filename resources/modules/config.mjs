@@ -35,7 +35,7 @@ export let config = {
                         guest: {
                             directories: {
                                 home: {
-                                    files: ['passwd.txt'],
+                                    files: ['passwd.txt', 'submarine_crush.txt'],
                                     directories: {
                                         files: {
                                             files: ['secret.jpeg']
@@ -67,14 +67,14 @@ export let config = {
             interval: { enabled: true },
             area: {
                 width: {
-                    min: 2,
-                    max: 100
+                    min: 5,
+                    max: 25
                 }, height: {
-                    min: 2,
-                    max: 100
+                    min: 5,
+                    max: 25
                 }, mines: { // w*h * value e [min, max]
                     min: 0.3,
-                    max: 0.9
+                    max: 0.7
                 }
             }
         }
