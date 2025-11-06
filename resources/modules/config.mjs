@@ -3,7 +3,7 @@ export let config = {
         help: {
             args: {
                 command: {
-                    comment: "Название команды",
+                    comment: "Название команды??? realno???",
                     required: false
                 }
             }, comment: 'Выводит список команд'
