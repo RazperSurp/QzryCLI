@@ -14,6 +14,7 @@ export default class Application {
     command;
     directories;
 
+    historyPos = -1;
     processes = [];
     history = [];
 
@@ -21,6 +22,8 @@ export default class Application {
         history: document.querySelector('#history'),
         path: document.querySelector('#path')
     };
+
+    get historyProcess() { return this.processes.reverse()[this.historyPos]; }
 
     get STATES() { return { WAITING: 0, PROCESSING: 1, LOCKED: 2 } }
 
@@ -58,12 +61,13 @@ export default class Application {
 
     async process(...input) {
         if (this.state != this.STATES.PROCESSING) {
+            let rawInput = [].concat(input).join(' ');
             this.state = this.STATES.PROCESSING;
 
-            this.__echo(`${this.user.username}@QzryCLI: ${this.currentPath}> ${input.join(' ')}`)
+            this.__echo(`${this.user.username}@QzryCLI: ${this.currentPath}> ${input.join(' ')}`, { marginTop: '10px' })
             this.command = new Command(input.shift(), ...input);
 
-            this.processes.push({ command: this.command, results: null });
+            this.processes.push({ raw: rawInput, command: this.command, results: null });
 
             let loader = this.__echo('');
             loader.classList.add('waiting');

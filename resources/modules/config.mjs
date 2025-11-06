@@ -2,20 +2,13 @@ export let config = {
     commands: {
         help: {
             args: {
-                name: {
+                command: {
                     comment: "Название команды",
                     required: false
                 }
             }, comment: 'Выводит список команд'
         }, ping: {
             comment: 'Возвращает "ПОНГ!"'
-        }, pic: {
-            args: {
-                name: {
-                    comment: "Название файла",
-                    required: true
-                }
-            }, comment: 'Выводит запрошенное локальное изображение'
         }, randompic: {
             comment: 'Выводит случайное изображение с фотохостинга Imgur'
         }, cd: {
@@ -25,8 +18,30 @@ export let config = {
                     required: true
                 }
             }, comment: 'Переходит в другую директорию'
+        }, ls: {
+            comment: 'Выводит содержимое каталога'
+        }, open: {
+            args: {
+                name: {
+                    comment: "Название файла",
+                    required: true
+                }
+            }, comment: 'Открывает файл'
+        }, mineswepper: {
+            args: {
+                width: {
+                    comment: "Ширина игрового поля",
+                    required: false
+                }, height: {
+                    comment: "Высота игрового поля",
+                    required: false
+                }, mines: {
+                    comment: "Количество мин",
+                    required: false
+                }
+            }, comment: 'Запускает игровую партию в "Сапёр"'
         }
-    },
+    }, 
     struct: {
         root: {
             directories: {
@@ -73,8 +88,8 @@ export let config = {
                     min: 5,
                     max: 25
                 }, mines: { // w*h * value e [min, max]
-                    min: 0.3,
-                    max: 0.7
+                    min: 0.2,
+                    max: 0.4
                 }
             }
         }

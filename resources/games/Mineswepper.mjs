@@ -197,7 +197,7 @@ export default class Mineswepper extends GameBase {
             } if (!cell.classList.contains('flag') && !cell.classList.contains('opened')) {
                 if (!doAuto && this.checkMine(...coordinates)) {
                     cell.innerText = 'X';
-                    this.stop(false)
+                    this.stop(false);
                 } else {
                     this.findCell(...coordinates).classList.add('opened');
                     if (minesNearby === 0) {

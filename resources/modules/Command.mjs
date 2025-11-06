@@ -31,7 +31,8 @@ export default class Command {
         this.name = name;
         this.args = args.filter(el => el);
 
-        if(typeof this[name] != 'function') this.results = this.handleError('COMMAND_NOT_FOUND');
+        if (!Object.keys(config.commands).find(cmd => cmd === this.name) || typeof this[name] != 'function') 
+            this.results = this.handleError('COMMAND_NOT_FOUND');
     }
 
     async execute() {
@@ -75,8 +76,20 @@ export default class Command {
     
     help() {
         let results = "";
-        for (const [command, params] of Object.entries(config.commands)) {
-            results += `${command} ${params.args !== undefined ? Object.keys(params.args).map(argParamName => { return `${params.args[argParamName].required ? '[' : '<'}${argParamName}${params.args[argParamName].required ? ']' : '>'}` }).join(' ') : ''} - ${params.comment}<br>`
+
+        if (this.args[0]) {
+            let command = this.args[0];
+            if (Object.keys(config.commands).find(name => name === command)) {
+                results += `${command} - ${config.commands[command].comment}.`;
+                if (config.commands[command].args !== undefined && Object.keys(config.commands[command].args).length > 0) {
+                    for (const [arg, desc] of Object.entries(config.commands[command].args))
+                        results += `<br># ${arg}${desc.required ? '*' : ''} - ${desc.comment}`;
+                }
+            } else return this.handleError('COMMAND_NOT_FOUND');
+        } else {
+            for (const [command, params] of Object.entries(config.commands)) {
+                results += `${command} ${params.args !== undefined ? Object.keys(params.args).map(argParamName => { return `${(params.args[argParamName].required ? '[' : '<')}${argParamName}${(params.args[argParamName].required ? ']' : '>')}` }).join(' ') : ''} - ${params.comment}<br>`
+            }
         }
 
         return results;
