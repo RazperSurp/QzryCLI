@@ -32,7 +32,6 @@ body * {
     line-height: 1.1;
 }
 
-#history *:not(.content),
 #history *:not(log) {
     animation: imgAppear .5s linear
 }
