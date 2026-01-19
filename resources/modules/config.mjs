@@ -50,7 +50,7 @@ export let config = {
                         guest: {
                             directories: {
                                 home: {
-                                    files: ['passwd.txt', 'submarine_crush.txt'],
+                                    files: ['passwd.txt', 'submarine_crush.txt', 'tamagochi.txt'],
                                     directories: {
                                         files: {
                                             files: ['secret.jpeg']
