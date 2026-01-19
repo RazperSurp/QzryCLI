@@ -141,7 +141,7 @@ export default class Command {
 
                                         resolve(result);
                                     }
-                                }, 5)
+                                }, 2)
                             })
                         }
 
